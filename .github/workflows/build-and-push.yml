@@ -62,8 +62,4 @@ jobs:
           aws s3 cp deploy.zip s3://iic2173-codedeploy/deploy.zip
 
       - name: Create Codedeploy Deployment
-        run: aws deploy create-deployment \
-          --application-name iic2173-codedeploy \
-          --deployment-group-name iic2173-deployment-group \
-          --s3-location bucket=iic2173-codedeploy,key=deploy.zip,bundleType=zip \
-          --file-exists-behavior OVERWRITE
+        run: aws deploy create-deployment --application-name iic2173-codedeploy  --deployment-group-name iic2173-deployment-group  --s3-location bucket=iic2173-codedeploy,key=deploy.zip,bundleType=zip  --file-exists-behavior OVERWRITE
