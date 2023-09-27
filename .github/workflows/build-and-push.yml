@@ -62,4 +62,19 @@ jobs:
           aws s3 cp deploy.zip s3://iic2173-codedeploy/deploy.zip
 
       - name: Create Codedeploy Deployment
-        run: aws deploy create-deployment --application-name iic2173-codedeploy  --deployment-group-name iic2173-deployment-group  --s3-location bucket=iic2173-codedeploy,key=deploy.zip,bundleType=zip  --file-exists-behavior OVERWRITE
+        id: codedeploy-deploy-trigger
+        env:
+          DEPLOYMENT_APPLICATION_NAME: iic2173-codedeploy
+          DEPLOYMENT_GROUP_NAME: iic2173-deployment-group
+          DEPLOYMENT_BUCKET_NAME: iic2173-codedeploy
+        # https://stackoverflow.com/questions/66381595/trying-to-parse-json-output-in-a-github-action
+        run: |
+          deploymentId=$(  aws deploy create-deployment \
+            --application-name $DEPLOYMENT_APPLICATION_NAME  \
+            --deployment-group-name $DEPLOYMENT_GROUP_NAME  \
+            --s3-location bucket=DEPLOYMENT_BUCKET_NAME,key=deploy.zip,bundleType=zip \
+             --file-exists-behavior OVERWRITE | | jq -r '.deploymentId')
+             echo "deploymentId=$deploymentId" >> $GITHUB_OUTPUT
+
+      - name: Wait until deployment is done
+        run: aws deploy wait deployment-successful --deployment-id ${{steps.codedeploy-deploy-trigger.outputs.deploymentId}}
