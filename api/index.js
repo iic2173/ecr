@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 
 // GET endpoint
 app.get("/", (req, res) => {
-  res.send("GET request received at / v2");
+  res.send("GET request received at / v3");
 });
 
 // GET endpoint
